@@ -1,4 +1,4 @@
-# 🚀 JavaExercises – Infosys Internship - NeuroFleetX
+# 🚀 Infosys Internship - NeuroFleetX
 
 Welcome to my **Repository**, created as part of the **Infosys NeuroFleetX – AI-Driven Urban Mobility Optimization Internship Program (Batch 5)**.  
 This repository contains all my Java practice programs and screenshots, organized topic-wise as per the internship requirements.  
