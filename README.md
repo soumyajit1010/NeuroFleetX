@@ -1,7 +1,7 @@
 # 🚀 Infosys Internship - NeuroFleetX
 
 Welcome to my **NeuroFleetX Repository**, created as part of the **Infosys NeuroFleetX – AI-Driven Urban Mobility Optimization Internship (Batch 5)**.  
-This repository contains all my **Java** and **React** practice exercises, organized topic-wise as per the internship requirements.
+This repository contains all my **Java** and **React** practice exercises, along with the **main project development modules**, organized as per the internship structure.
 
 ---
 
@@ -16,66 +16,66 @@ This repository contains all my **Java** and **React** practice exercises, organ
 ---
 
 ## 📁 Repository Structure
----
-📦 NeuroFleetX
- ┣ 📂 Java_Exercises
- ┃ ┣ 📂 Datatype_Programs
- ┃ ┣ 📂 Operator_Programs
- ┃ ┣ 📂 Conditional_Programs
- ┃ ┣ 📂 Looping_Programs
- ┃ ┣ 📂 Array_Programs
- ┃ ┗ 📂 Class_Object_Programs
- ┃
- ┣ 📂 React_Exercises
- ┃ ┗ 📄 Login_Page (React Practice)
- ┃
- ┣ 📂 Main_Project
- ┃ ┗ 📂 Module_1_Authentication
- ┃     ┣ 📂 frontend (React)
- ┃     ┗ 📂 screenshots
- ┃
- ┗ 📄 README.md
-
 
 ---
 
 
 ---
 
-## 💡 Topics Covered
+## 💡 Topics & Modules Covered
 
 | Category | Description |
 |-----------|-------------|
-| 🔤 **Datatype Programs** | Basic programs demonstrating Java data types. |
-| ➕ **Operator Programs** | Programs covering arithmetic, relational, and logical operators. |
-| 🔀 **Conditional Programs** | Programs using if, if-else, and switch statements. |
-| 🔁 **Looping Programs** | Programs using for, while, and do-while loops. |
-| 🧮 **Array Programs** | Single and multidimensional array-based programs. |
-| 🧱 **Class & Object Programs** | Demonstrations of class creation, object instantiation, and constructors. |
-| ⚛️ **React Exercises** | Starting with a simple login page — to practice React fundamentals. |
+| 🔤 **Datatype Programs** | Java basics demonstrating primitive and non-primitive data types. |
+| ➕ **Operator Programs** | Covers arithmetic, relational, and logical operators. |
+| 🔀 **Conditional Programs** | Using `if`, `if-else`, and `switch` control statements. |
+| 🔁 **Looping Programs** | Implementation of `for`, `while`, and `do-while` loops. |
+| 🧮 **Array Programs** | Single and multidimensional array-based problems. |
+| 🧱 **Class & Object Programs** | Demonstrating classes, objects, and constructors. |
+| ⚛️ **React Exercises** | Hands-on practice with a **Login Page UI** using React. |
+| 🧩 **Main Project (Module 1)** | Developed **Authentication & Role Management** frontend in React. |
+
+---
+
+## 🧩 Project Modules (Main NeuroFleetX Application)
+
+| Module | Description | Status |
+|:-------|:-------------|:-------:|
+| **Module 1** | Authentication & Role Management | ✅ Ongoing (Frontend - React) |
+| **Module 2** | Fleet Inventory & Vehicle Telemetry | 🔜 Upcoming |
+| **Module 3** | AI Route & Load Optimization Engine | 🔜 Upcoming |
+| **Module 4** | Predictive Maintenance & Health Analytics | 🔜 Upcoming |
+| **Module 5** | Customer Booking & Smart Recommendations | 🔜 Upcoming |
+| **Module 6** | Admin Dashboard & Urban Mobility Insights | 🔜 Upcoming |
 
 ---
 
 ## 🧰 Technologies Used
 - **Languages:** Java, JavaScript (React)
 - **Frontend Framework:** React.js
-- **Tools:** VS Code / IntelliJ IDEA / Eclipse
+- **Tools:** VS Code / IntelliJ IDEA / Eclipse  
 - **Version Control:** Git & GitHub
 
 ---
 
 ## 🖼️ Screenshots
-Each folder includes a **Screenshots** subfolder containing images of program execution or UI previews.
+Each folder contains a **Screenshots** subfolder showing:
+- Program Output (for Java)
+- UI Preview (for React & Project Modules)
+
+You can view the Module 1 Login Page preview here:  
+![Login Page Screenshot](./Main_Project/Module_1_Authentication/screenshots/login.png)
 
 ---
 
 ## ✨ Author
 **👨‍💻 Soumyajit Rout**  
-B.Tech CSE | Institute of Technical Education & Research (ITER), SOA University  
+B.Tech in Computer Science & Engineering  
+**Institute of Technical Education & Research (ITER), SOA University**  
 📧 [soumyajitrout81@gmail.com](mailto:soumyajitrout81@gmail.com)  
 🌐 [GitHub: soumyajit1010](https://github.com/soumyajit1010)
 
 ---
 
 ## 🏁 Acknowledgement
-A heartfelt thanks to **Infosys Springboard** and **Mentor Senthil Subramanian** for providing this valuable opportunity through the **NeuroFleetX Internship Program**, helping me enhance both **Java** and **React** development skills.
+A heartfelt thanks to **Infosys Springboard** and **Mentor Senthil Subramanian** for providing this incredible opportunity through the **NeuroFleetX Internship Program**, helping me strengthen both **Java** and **React** development skills.
