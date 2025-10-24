@@ -17,6 +17,26 @@ This repository contains all my **Java** and **React** practice exercises, organ
 
 ## 📁 Repository Structure
 ---
+📦 NeuroFleetX
+ ┣ 📂 Java_Exercises
+ ┃ ┣ 📂 Datatype_Programs
+ ┃ ┣ 📂 Operator_Programs
+ ┃ ┣ 📂 Conditional_Programs
+ ┃ ┣ 📂 Looping_Programs
+ ┃ ┣ 📂 Array_Programs
+ ┃ ┗ 📂 Class_Object_Programs
+ ┃
+ ┣ 📂 React_Exercises
+ ┃ ┗ 📄 Login_Page (React Practice)
+ ┃
+ ┣ 📂 Main_Project
+ ┃ ┗ 📂 Module_1_Authentication
+ ┃     ┣ 📂 frontend (React)
+ ┃     ┗ 📂 screenshots
+ ┃
+ ┗ 📄 README.md
+
+
 ---
 
 
