@@ -64,7 +64,7 @@ Each folder contains a **Screenshots** subfolder showing:
 - UI Preview (for React & Project Modules)
 
 You can view the Module 1 Login Page preview here:  
-![Login Page Screenshot](./neurofleetx-frontend/Screenshots)
+[Login Page Screenshot](./neurofleetx-frontend/Screenshots)
 
 ---
 
