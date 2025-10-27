@@ -1,19 +1,26 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
+import CustomerDashboard from "./pages/dashboards/CustomerDashboard";
+import AdminDashboard from "./pages/dashboards/AdminDashboard";
+import FleetManagerDashboard from "./pages/dashboards/FleetManagerDashboard";
+import DriverDashboard from "./pages/dashboards/DriverDashboard";
 
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard/:role" element={<Dashboard />} />
+        <Route path="/dashboard/customer" element={<CustomerDashboard />} />
+        <Route path="/dashboard/admin" element={<AdminDashboard />} />
+        <Route path="/dashboard/fleetmanager" element={<FleetManagerDashboard />} />
+        <Route path="/dashboard/driver" element={<DriverDashboard />} />
+        <Route path="/" element={<Login />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-}
+};
 
 export default App;

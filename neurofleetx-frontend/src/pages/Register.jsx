@@ -17,81 +17,73 @@ const Register = () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:8080/register", {
+      await axios.post("http://localhost:8080/register", {
         name,
         email,
         password,
         role,
       });
-      console.log(response.data);
-      navigate("/");
+      alert("Registration successful! Please log in.");
+      navigate("/login");
     } catch (error) {
-      console.error(error);
-      alert("Registration failed!");
+      console.error("Registration error:", error);
+      alert(error.response?.data?.message || "Registration failed!");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 p-4">
-      <div className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-full max-w-md border border-white/20">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-gray-800">Create Account</h2>
-          <p className="text-gray-600 mt-2">Join us today</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 to-indigo-600">
+      <div className="bg-slate-100 p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+            <label className="block text-gray-800">Full Name</label>
             <input
               type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 text-gray-800 placeholder-gray-400"
-              placeholder="John Doe"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              placeholder="John Doe"
               required
             />
           </div>
-
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+            <label className="block text-gray-800">Email</label>
             <input
               type="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 text-gray-800 placeholder-gray-400"
-              placeholder="you@example.com"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
               required
             />
           </div>
-
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+            <label className="block text-gray-800">Password</label>
             <input
               type="password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 text-gray-800 placeholder-gray-400"
-              placeholder="••••••••"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
               required
             />
           </div>
-
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+            <label className="block text-gray-800">Confirm Password</label>
             <input
               type="password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 text-gray-800 placeholder-gray-400"
-              placeholder="••••••••"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
               required
             />
           </div>
-
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
+            <label className="block text-gray-800">Role</label>
             <select
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 text-gray-800"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
@@ -101,19 +93,14 @@ const Register = () => {
               <option value="Customer">Customer</option>
             </select>
           </div>
-
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-3 rounded-xl hover:from-cyan-600 hover:to-blue-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
-          >
+          <button className="w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 transition-colors">
             Register
           </button>
         </form>
-
-        <p className="text-center text-sm text-gray-600 mt-6">
+        <p className="text-center text-gray-600 mt-4">
           Already have an account?{" "}
-          <Link to="/" className="font-semibold text-cyan-600 hover:text-cyan-800 transition-colors">
-            Login here
+          <Link className="text-indigo-500 hover:underline" to="/login">
+            Login
           </Link>
         </p>
       </div>
