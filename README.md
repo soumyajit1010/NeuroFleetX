@@ -41,8 +41,8 @@ This repository contains all my **Java** and **React** practice exercises, along
 
 | Module | Description | Status |
 |:-------|:-------------|:-------:|
-| **Module 1** | Authentication & Role Management | ✅ Ongoing (Frontend - React) |
-| **Module 2** | Fleet Inventory & Vehicle Telemetry | 🔜 Upcoming |
+| **Module 1** | Authentication & Role Management | ✅ Complete |
+| **Module 2** | Fleet Inventory & Vehicle Telemetry | ✅ Ongoing |
 | **Module 3** | AI Route & Load Optimization Engine | 🔜 Upcoming |
 | **Module 4** | Predictive Maintenance & Health Analytics | 🔜 Upcoming |
 | **Module 5** | Customer Booking & Smart Recommendations | 🔜 Upcoming |
