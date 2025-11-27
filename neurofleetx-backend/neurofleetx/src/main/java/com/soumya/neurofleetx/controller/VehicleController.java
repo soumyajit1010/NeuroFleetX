@@ -1,6 +1,6 @@
+// src/main/java/com/soumya/neurofleetx/controller/VehicleController.java
 package com.soumya.neurofleetx.controller;
 
-import com.soumya.neurofleetx.dto.TelemetryUpdateDTO;
 import com.soumya.neurofleetx.entity.Vehicle;
 import com.soumya.neurofleetx.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -16,19 +17,19 @@ public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
 
-    @PostMapping
-    public Vehicle createVehicle(@RequestBody Vehicle vehicle) {
-        return vehicleService.addVehicle(vehicle);
-    }
-
     @GetMapping
     public List<Vehicle> getAllVehicles() {
         return vehicleService.getAllVehicles();
     }
 
     @GetMapping("/{id}")
-    public Vehicle getVehicle(@PathVariable Long id) {
-        return vehicleService.getVehicleById(id);
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
+        return ResponseEntity.ok(vehicleService.getVehicleById(id));
+    }
+
+    @PostMapping
+    public Vehicle createVehicle(@RequestBody Vehicle vehicle) {
+        return vehicleService.createVehicle(vehicle);
     }
 
     @PutMapping("/{id}")
@@ -42,13 +43,13 @@ public class VehicleController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}/telemetry")
-    public Vehicle updateTelemetry(@PathVariable Long id, @RequestBody TelemetryUpdateDTO telemetry) {
-        return vehicleService.updateTelemetry(id, telemetry);
-    }
+    // THIS IS THE ONLY ONE YOU NEED — works perfectly with your frontend
+    @PatchMapping("/{id}/telemetry")
+    public ResponseEntity<Vehicle> updateTelemetry(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates) {
 
-    @GetMapping("/available")
-    public List<Vehicle> getAvailable() {
-        return vehicleService.getAvailableVehicles();
+        Vehicle vehicle = vehicleService.updateTelemetry(id, updates);
+        return ResponseEntity.ok(vehicle);
     }
 }

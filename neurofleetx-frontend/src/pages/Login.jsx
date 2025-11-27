@@ -13,22 +13,26 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await axios.post("http://localhost:8080/login", {
-        email,
-        password,
-      });
-      localStorage.setItem("userRole", data.role);
-      localStorage.setItem("userEmail", email);
-      navigate(`/dashboard/${data.role.toLowerCase()}`);
-    } catch (error) {
-      alert(
-        error.response?.data?.message ||
-          "Login failed! Please check your credentials."
-      );
-    }
-  };
+  e.preventDefault();
+  try {
+    const { data } = await axios.post("http://localhost:8080/login", {
+      email,
+      password,
+    });
+
+    // Save these 3 things
+    localStorage.setItem("userRole", data.role);
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userPassword", password);   // ← THIS LINE WAS MISSING!
+
+    navigate(`/dashboard/${data.role.toLowerCase()}`);
+  } catch (error) {
+    alert(
+      error.response?.data?.message ||
+        "Login failed! Please check your credentials."
+    );
+  }
+};
 
   const handleGoogleLogin = () => {
     const authUrl =

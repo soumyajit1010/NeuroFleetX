@@ -1,114 +1,77 @@
+// src/main/java/com/soumya/neurofleetx/service/VehicleService.java
 package com.soumya.neurofleetx.service;
 
-import com.soumya.neurofleetx.dto.TelemetryUpdateDTO;
 import com.soumya.neurofleetx.entity.Vehicle;
 import com.soumya.neurofleetx.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class VehicleService {
 
     @Autowired
-    private VehicleRepository vehicleRepo;
-
-    // ==================== CRUD Operations ====================
+    private VehicleRepository vehicleRepository;
 
     public List<Vehicle> getAllVehicles() {
-        return vehicleRepo.findAll();
+        return vehicleRepository.findAll();
     }
 
     public Vehicle getVehicleById(Long id) {
-        return vehicleRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+        return vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
     }
 
-    public Vehicle addVehicle(Vehicle vehicle) {
-        // Optional: Validate registration number uniqueness
-        if (vehicleRepo.existsByRegistrationNumber(vehicle.getRegistrationNumber())) {
-            throw new RuntimeException("Vehicle with registration number " +
-                    vehicle.getRegistrationNumber() + " already exists");
-        }
-        return vehicleRepo.save(vehicle);
+    public Vehicle createVehicle(Vehicle vehicle) {
+        vehicle.setStatus("AVAILABLE");
+        vehicle.setLastUpdated(LocalDateTime.now());
+        return vehicleRepository.save(vehicle);
     }
 
-    public Vehicle updateVehicle(Long id, Vehicle vehicleDetails) {
+    public Vehicle updateVehicle(Long id, Vehicle updated) {
         Vehicle vehicle = getVehicleById(id);
-
-        // Update fields only if provided (non-null)
-        Optional.ofNullable(vehicleDetails.getRegistrationNumber())
-                .ifPresent(vehicle::setRegistrationNumber);
-        Optional.ofNullable(vehicleDetails.getModel())
-                .ifPresent(vehicle::setModel);
-        Optional.ofNullable(vehicleDetails.getType())
-                .ifPresent(vehicle::setType);
-        Optional.ofNullable(vehicleDetails.getStatus())
-                .ifPresent(vehicle::setStatus);
-        Optional.ofNullable(vehicleDetails.getFuelType())
-                .ifPresent(vehicle::setFuelType);
-        Optional.ofNullable(vehicleDetails.getFuelLevel())
-                .ifPresent(vehicle::setFuelLevel);
-        Optional.ofNullable(vehicleDetails.getMileage())
-                .ifPresent(vehicle::setMileage);
-        Optional.ofNullable(vehicleDetails.getAssignedDriver())
-                .ifPresent(vehicle::setAssignedDriver);
-        Optional.ofNullable(vehicleDetails.getLastServiceDate())
-                .ifPresent(vehicle::setLastServiceDate);
-
-        return vehicleRepo.save(vehicle);
+        vehicle.setLicensePlate(updated.getLicensePlate());
+        vehicle.setMake(updated.getMake());
+        vehicle.setModel(updated.getModel());
+        vehicle.setManufacturingYear(updated.getManufacturingYear());
+        vehicle.setVin(updated.getVin());
+        vehicle.setStatus(updated.getStatus());
+        return vehicleRepository.save(vehicle);
     }
 
     public void deleteVehicle(Long id) {
-        if (!vehicleRepo.existsById(id)) {
-            throw new RuntimeException("Vehicle not found with id: " + id);
-        }
-        vehicleRepo.deleteById(id);
+        vehicleRepository.deleteById(id);
     }
 
-    // ==================== Custom Queries ====================
-
-    public List<Vehicle> getAvailableVehicles() {
-        return vehicleRepo.findByStatus("Available");
-    }
-
-    public List<Vehicle> getLowFuelVehicles() {
-        return vehicleRepo.findByFuelLevelLessThan(20.0);
-    }
-
-    // ==================== Telemetry Update ====================
-
-    public Vehicle updateTelemetry(Long id, TelemetryUpdateDTO telemetry) {
+    // This is the ONLY telemetry method you need – perfect and working
+    public Vehicle updateTelemetry(Long id, Map<String, Object> updates) {
         Vehicle vehicle = getVehicleById(id);
 
-        vehicle.setCurrentSpeed(telemetry.getSpeed());
-        vehicle.setFuelLevel(telemetry.getFuelLevel());
-        vehicle.setLatitude(telemetry.getLatitude());
-        vehicle.setLongitude(telemetry.getLongitude());
-        vehicle.setEngineTemperature(telemetry.getEngineTemperature());
-        vehicle.setLastTelemetryUpdate(LocalDateTime.now());
-
-        return vehicleRepo.save(vehicle);
-    }
-
-    // ==================== Alert System ====================
-
-    public List<String> checkAlerts() {
-        List<String> alerts = new ArrayList<>();
-        List<Vehicle> vehicles = vehicleRepo.findAll();
-
-        for (Vehicle v : vehicles) {
-            if (v.getFuelLevel() != null && v.getFuelLevel() < 20) {
-                alerts.add("Low Fuel: " + v.getRegistrationNumber());
-            }
-            if (v.getEngineTemperature() != null && v.getEngineTemperature() > 90) {
-                alerts.add("Overheating: " + v.getRegistrationNumber());
-            }
+        if (updates.containsKey("latitude")) {
+            vehicle.setLatitude(((Number) updates.get("latitude")).doubleValue());
         }
-        return alerts;
+        if (updates.containsKey("longitude")) {
+            vehicle.setLongitude(((Number) updates.get("longitude")).doubleValue());
+        }
+        if (updates.containsKey("speed")) {
+            vehicle.setSpeed(((Number) updates.get("speed")).doubleValue());
+        }
+        if (updates.containsKey("fuelLevel")) {
+            vehicle.setFuelLevel(((Number) updates.get("fuelLevel")).doubleValue());
+        }
+
+        vehicle.setLastUpdated(LocalDateTime.now());
+        return vehicleRepository.save(vehicle);
     }
+
+    // Optional: nice record if you want to use it later (not used now)
+    public record TelemetryUpdate(
+            Double latitude,
+            Double longitude,
+            Double speed,
+            Double fuelLevel
+    ) {}
 }

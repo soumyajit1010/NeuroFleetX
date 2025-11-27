@@ -1,41 +1,38 @@
+// src/main/java/com/soumya/neurofleetx/entity/Vehicle.java
 package com.soumya.neurofleetx.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.LocalDate;
+import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vehicles")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-@Builder
+@Data
 public class Vehicle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String registrationNumber;
-
+    private String licensePlate;
+    private String make;
     private String model;
-    private String type; // Truck, Van, Car, etc.
-    private String status; // Available, In Use, Under Maintenance, Reserved
-    private String fuelType; // Petrol, Diesel, Electric, CNG
-    private Double fuelLevel; // 0 to 100 (%)
-    private Double mileage; // km/l or kWh/100km
-    private String assignedDriver; // Can be Driver ID or Name
-    private LocalDate lastServiceDate;
 
-    // Telemetry Fields (Live Data)
-    private Double currentSpeed; // km/h
+    // REMOVED the wrong @Column name – let Hibernate use the field name
+    private Integer manufacturingYear;
+
+    private String vin;
+
+    private String status = "AVAILABLE";
+
+    // Telemetry
     private Double latitude;
     private Double longitude;
-    private Double engineTemperature; // °C
-    private LocalDateTime lastTelemetryUpdate;
+    private Double speed;
+    private Double fuelLevel;
+    private LocalDateTime lastUpdated;
+
+    @ManyToOne
+    @JoinColumn(name = "driver_id")
+    private User driver;
 }

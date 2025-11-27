@@ -2,3 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* FIX: Leaflet map appearing above modals */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+.leaflet-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane,
+.leaflet-control {
+  z-index: 0 !important;
+}
+
+/* Make sure modal is above everything */
+.fixed.inset-0.z-50 {
+  z-index: 9999 !important;
+}
