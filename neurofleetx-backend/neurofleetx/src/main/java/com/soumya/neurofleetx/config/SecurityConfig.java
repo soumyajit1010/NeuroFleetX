@@ -1,5 +1,4 @@
 // src/main/java/com/soumya/neurofleetx/config/SecurityConfig.java
-
 package com.soumya.neurofleetx.config;
 
 import org.springframework.context.annotation.Bean;
@@ -13,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    // This bean is needed by your UserService
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -22,22 +20,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF (we are stateless + API only)
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
 
-                // Allow all API endpoints + login/register + H2 console
+                // THIS IS THE FINAL FIX — PERMIT ALL API ENDPOINTS FIRST
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**", "/login", "/register", "/h2-console/**").permitAll()
-                        .anyRequest().permitAll()
-                )
-
-                // Stateless = no sessions
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-
-                // Only if you use H2 console in browser
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
+                        .requestMatchers("/api/optimize/**").permitAll()     // ← THIS LINE FIRST
+                        .requestMatchers("/api/**").permitAll()              // ← THIS SECOND
+                        .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .anyRequest().permitAll()                            // ← Keep this last
+                );
 
         return http.build();
     }

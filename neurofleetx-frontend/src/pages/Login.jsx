@@ -1,146 +1,112 @@
+// src/pages/Login.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import loginBg from "../assets/login.jpg";
-
-// Google OAuth (replace with your real values)
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
-const REDIRECT_URI = `${window.location.origin}/auth/google/callback`;
+import loginBg from "../assets/login.jpg";           // ← FIXED: IMPORT IMAGE
+import { useAuth } from "../context/AuthContext";    // ← UNCOMMENT THIS
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();  // ← UNCOMMENT THIS
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const { data } = await axios.post("http://localhost:8080/login", {
-      email,
-      password,
-    });
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { data } = await axios.post("http://localhost:8080/login", {
+        email,
+        password,
+      });
 
-    // Save these 3 things
-    localStorage.setItem("userRole", data.role);
-    localStorage.setItem("userEmail", email);
-    localStorage.setItem("userPassword", password);   // ← THIS LINE WAS MISSING!
+      const user = {
+        id: data.id,
+        name: data.name || email.split("@")[0],
+        email: data.email,
+        role: data.role,
+      };
 
-    navigate(`/dashboard/${data.role.toLowerCase()}`);
-  } catch (error) {
-    alert(
-      error.response?.data?.message ||
-        "Login failed! Please check your credentials."
-    );
-  }
-};
+      login(user);  // ← This saves to AuthContext + localStorage
 
-  const handleGoogleLogin = () => {
-    const authUrl =
-      `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${GOOGLE_CLIENT_ID}` +
-      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-      `&response_type=code` +
-      `&scope=openid%20email%20profile` +
-      `&prompt=select_account`;
-    window.location.href = authUrl;
+      alert(`Welcome back, ${user.name}!`);
+
+      const roleLower = user.role.toLowerCase();
+      if (roleLower.includes("fleet")) {
+        navigate("/dashboard/fleetmanager");
+      } else if (roleLower === "driver") {
+        navigate("/dashboard/driver");
+      } else if (roleLower === "admin") {
+        navigate("/dashboard/admin");
+      } else {
+        navigate("/dashboard/customer");
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || "Login failed!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* ====================== LEFT: LOGIN FORM + WELCOME TEXT ====================== */}
-      <div className="flex-1 flex flex-col justify-center p-6 md:p-12 bg-gradient-to-bl from-indigo-50 to-purple-300 min-h-screen md:min-h-0">
+      <div className="flex-1 flex flex-col justify-center p-6 md:p-12 bg-gradient-to-bl from-indigo-50 to-purple-300">
         <div className="w-full max-w-md mx-auto">
-          {/* === WELCOME TEXT ABOVE FORM === */}
-          <div className="mt-6 text-center mb-5">
-            <h1 className="text-3xl font-bold text-indigo-900 mb-1">NeuroFleetX</h1>
-            <p className="text-indigo-700">Smart Fleet Management</p>
+          <div className="text-center mb-8">
+            <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+              NeuroFleetX
+            </h1>
+            <p className="text-xl text-indigo-700 font-medium mt-2">AI-Powered Fleet Management</p>
           </div>
 
-          {/* Glassmorphic Card */}
-          <div className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-white/30">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              {/* Submit */}
+          <div className="bg-white/95 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-purple-100">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <input
+                type="email"
+                placeholder="fleet@neurofleetx.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-6 py-4 rounded-2xl border-2 border-gray-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-200 transition text-lg"
+                required
+                disabled={loading}
+              />
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-6 py-4 rounded-2xl border-2 border-gray-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-200 transition text-lg"
+                required
+                disabled={loading}
+              />
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
+                disabled={loading}
+                className={`w-full py-5 rounded-2xl font-bold text-xl text-white transition-all transform hover:scale-105 shadow-xl ${
+                  loading ? "bg-gray-500" : "bg-gradient-to-r from-indigo-600 to-purple-600"
+                }`}
               >
-                Sign In
-              </button>
-
-              {/* Divider */}
-              <div className="flex items-center my-6">
-                <div className="flex-1 border-t border-gray-300"></div>
-                <span className="px-3 text-sm text-gray-500">or</span>
-                <div className="flex-1 border-t border-gray-300"></div>
-              </div>
-
-              {/* Google */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-50 hover:shadow-md transition"
-              >
-                <img
-                  src="https://developers.google.com/identity/images/g-logo.png"
-                  alt="Google"
-                  className="w-5 h-5"
-                />
-                Continue with Google
+                {loading ? "Signing In..." : "Sign In to Dashboard"}
               </button>
             </form>
 
-            <p className="text-center text-sm text-gray-600 mt-6">
+            <div className="mt-8 text-center text-gray-600">
               Don't have an account?{" "}
-              <Link
-                to="/register"
-                className="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline"
-              >
-                Sign up
+              <Link to="/register" className="font-bold text-indigo-600 hover:underline">
+                Register here
               </Link>
-            </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ====================== RIGHT: CENTERED PNG ====================== */}
       <div className="hidden md:flex flex-1 items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-300 p-8">
-        <div className="relative w-full max-w-md lg:max-w-lg text-center">
-          <img
-            src={loginBg}
-            alt="Menu Mate Illustration"
-            className="w-full h-auto max-h-[80vh] object-contain rounded-2xl shadow-2xl"
-          />
-        </div>
+        <img
+          src={loginBg}
+          alt="NeuroFleetX Logistics"
+          className="max-h-[85vh] rounded-3xl shadow-2xl border-8 border-white/50"
+        />
       </div>
     </div>
   );

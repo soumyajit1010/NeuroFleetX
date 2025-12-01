@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 public class UserController {
 
@@ -22,4 +25,13 @@ public class UserController {
     public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword()));
     }
+
+    @GetMapping("/drivers")
+    public List<User> getDrivers() {
+        return userService.getAllUsers().stream()
+                .filter(u -> u.getRole() == User.Role.Driver)
+                .collect(Collectors.toList());
+    }
+
+
 }

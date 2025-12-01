@@ -18,6 +18,8 @@ public class Vehicle {
     private String make;
     private String model;
 
+    private String registrationNumber;
+
     // REMOVED the wrong @Column name – let Hibernate use the field name
     private Integer manufacturingYear;
 
@@ -35,4 +37,8 @@ public class Vehicle {
     @ManyToOne
     @JoinColumn(name = "driver_id")
     private User driver;
+
+    @OneToOne(mappedBy = "vehicle", cascade = CascadeType.ALL)
+    private VehicleHealth health;
+
 }
