@@ -28,6 +28,10 @@ public class RouteOptimizationService {
      */
     public RoutePlan optimize(List<DeliveryJob> jobs, List<Vehicle> availableVehicles, int maxVehicles) {
         // Basic validation
+        System.out.println("OPTIMIZER STARTED with " + jobs.size() + " jobs and maxVehicles=" + maxVehicles);
+        jobs.forEach(j -> System.out.println("Job ID: " + j.getId() + " Lat: " + j.getLatitude() + " Lng: " + j.getLongitude() + " Weight: " + j.getWeightKg()));
+        // ... rest of your code
+
         if (jobs == null) jobs = Collections.emptyList();
         List<DeliveryJob> inputJobs = new ArrayList<>();
         for (DeliveryJob j : jobs) {
@@ -184,12 +188,19 @@ public class RouteOptimizationService {
     }
 
     private void twoOpt(List<Integer> route, double[][] dist) {
+        int n = route.size();
         boolean improved = true;
-        while (improved) {
+        int iterations = 0;
+        final int MAX_ITERATIONS = 500;  // ← THIS SAVES YOUR LIFE
+
+        while (improved && iterations < MAX_ITERATIONS) {
             improved = false;
-            for (int i = 1; i < route.size() - 2; i++) {
-                for (int k = i + 1; k < route.size() - 1; k++) {
-                    if (cross(route, i, k, dist) < 0) {
+            iterations++;
+            for (int i = 1; i < n - 2; i++) {
+                for (int k = i + 1; k < n - 1; k++) {
+                    double delta = (dist[route.get(i-1)][route.get(k)] + dist[route.get(k+1)][route.get(i)])
+                            - (dist[route.get(i-1)][route.get(i)] + dist[route.get(k)][route.get(k+1)]);
+                    if (delta < -0.001) {  // improvement
                         reverse(route, i, k);
                         improved = true;
                     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,8 @@ public class RoutePlan {
     private double totalDistanceKm;
     private int estimatedTimeMinutes;
 
-    @OneToMany(mappedBy = "routePlan", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "routePlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Changed to LAZY
     @JsonManagedReference
-    @JsonInclude(JsonInclude.Include.ALWAYS)  // THIS IS THE KILLER LINE
+    @JsonInclude(JsonInclude.Include.NON_NULL) // Ensure jobs is included if not null
     private List<DeliveryJob> jobs = new ArrayList<>();
 }

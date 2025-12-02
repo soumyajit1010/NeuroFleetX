@@ -1,3 +1,5 @@
+// src/main/java/com/soumya/neurofleetx/repository/DeliveryJobRepository.java
+
 package com.soumya.neurofleetx.repository;
 
 import com.soumya.neurofleetx.entity.DeliveryJob;
@@ -6,9 +8,12 @@ import java.util.List;
 
 public interface DeliveryJobRepository extends JpaRepository<DeliveryJob, Long> {
 
-    // Find jobs by plan id
+    List<DeliveryJob> findByRoutePlanIsNull();
+
     List<DeliveryJob> findByRoutePlanId(Long routePlanId);
 
-    // Find jobs for a specific plan & assigned vehicle (vehicle route)
-    List<DeliveryJob> findByRoutePlanIdAndAssignedVehicleId(Long routePlanId, Long assignedVehicleId);
+    List<DeliveryJob> findByRoutePlanIdAndAssignedVehicleId(Long routePlanId, Long vehicleId);
+
+    // THIS LINE WAS MISSING — ADD IT NOW!
+    List<DeliveryJob> findByAssignedDriverId(Long driverId);
 }

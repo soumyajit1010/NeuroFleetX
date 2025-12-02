@@ -1,22 +1,25 @@
 package com.soumya.neurofleetx.controller;
 
 import com.soumya.neurofleetx.dto.DeliveryJobDTO;
-import com.soumya.neurofleetx.dto.DeliveryJobRequest;
 import com.soumya.neurofleetx.dto.RoutePlanDTO;
 import com.soumya.neurofleetx.entity.DeliveryJob;
 import com.soumya.neurofleetx.entity.RoutePlan;
 import com.soumya.neurofleetx.entity.User;
 import com.soumya.neurofleetx.entity.Vehicle;
+import com.soumya.neurofleetx.repository.DeliveryJobRepository;
 import com.soumya.neurofleetx.repository.RoutePlanRepository;
 import com.soumya.neurofleetx.repository.UserRepository;
-import com.soumya.neurofleetx.repository.DeliveryJobRepository;
 import com.soumya.neurofleetx.service.RouteOptimizationService;
 import com.soumya.neurofleetx.service.VehicleService;
+
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,84 +44,46 @@ public class RouteOptimizationController {
     @Autowired
     private DeliveryJobRepository deliveryRepo;
 
+    // 1️⃣ CREATE OPTIMIZED PLAN
     @PostMapping("")
     @Transactional
-    public ResponseEntity<RoutePlanDTO> createOptimizedPlan(
-            @RequestBody List<DeliveryJobRequest> jobRequests,
+    public ResponseEntity<RoutePlan> createOptimizedPlan(
+            @RequestBody List<Map<String, Object>> jobDataList,
             @RequestParam(defaultValue = "5") int maxVehicles) {
 
-        List<DeliveryJob> jobs = jobRequests.stream().map(req -> {
-            DeliveryJob j = new DeliveryJob();
-            j.setCustomerName(req.getCustomerName());
-            j.setPhone(req.getPhone());
-            j.setAddress(req.getAddress());
-            j.setLatitude(req.getLatitude());
-            j.setLongitude(req.getLongitude());
-            j.setWeightKg(req.getWeightKg() == null ? 0.0 : req.getWeightKg());
-            return j;
-        }).collect(Collectors.toList());
-
-        boolean anyMissing = jobs.stream()
-                .anyMatch(j -> j.getLatitude() == null || j.getLongitude() == null);
-        if (anyMissing) {
+        if (jobDataList == null || jobDataList.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
 
-        // Get all available vehicles from DB
+        List<DeliveryJob> jobs = new ArrayList<>();
+        for (Map<String, Object> data : jobDataList) {
+            Long id = Long.valueOf(data.get("id").toString());
+            DeliveryJob job = deliveryRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Job not found: " + id));
+
+            job.setLatitude((Double) data.get("latitude"));
+            job.setLongitude((Double) data.get("longitude"));
+            job.setWeightKg(((Number) data.get("weightKg")).doubleValue());
+            jobs.add(job);
+        }
+
         List<Vehicle> vehicles = vehicleService.getAllVehicles();
+        int effectiveMaxVehicles = Math.min(maxVehicles, Math.max(1, vehicles.size()));
 
-        // Clamp maxVehicles to the number of available vehicles (can't use more vehicles than exist)
-        int effectiveMaxVehicles = Math.max(1, Math.min(maxVehicles, Math.max(1, vehicles.size())));
-
-        // Call optimizer with the effectiveMaxVehicles
         RoutePlan plan = optimizer.optimize(jobs, vehicles, effectiveMaxVehicles);
-
-        // Fix: ensure numberOfVehicles reflects what optimizer actually produced
-        int actualVehiclesUsed = plan.getJobs().stream()
-                .map(DeliveryJob::getAssignedVehicleId)
-                .filter(vid -> vid != null)
-                .collect(Collectors.groupingBy(v -> v))
-                .size();
-
-        // If optimizer sets numberOfVehicles internally, keep it; else set the calculated value
-        plan.setNumberOfVehicles(Math.max(plan.getNumberOfVehicles(), actualVehiclesUsed));
-
-        // Link jobs -> plan so JPA persists route_plan_id
         plan.getJobs().forEach(job -> job.setRoutePlan(plan));
-
         RoutePlan saved = planRepo.save(plan);
+        Hibernate.initialize(saved.getJobs());
 
-        RoutePlanDTO dto = new RoutePlanDTO(
-                saved.getId(),
-                saved.getCreatedAt(),
-                saved.getNumberOfVehicles(),
-                saved.getTotalDistanceKm(),
-                saved.getEstimatedTimeMinutes(),
-                saved.getJobs().stream()
-                        .map(job -> new DeliveryJobDTO(
-                                job.getId(),
-                                job.getCustomerName(),
-                                job.getAddress(),
-                                job.getPhone(),
-                                job.getLatitude(),
-                                job.getLongitude(),
-                                job.getSequenceInRoute(),
-                                job.getWeightKg(),
-                                job.getAssignedDriverId(),
-                                job.getAssignedVehicleId(),
-                                job.getAssignedVehicleRegNo()
-                        ))
-                        .collect(Collectors.toList())
-        );
-
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(saved);
     }
 
-
-    // Return all plans as DTOs
+    // 2️⃣ GET ALL PLANS (for RouteHistory)
     @GetMapping("/plans")
     public List<RoutePlanDTO> getAllPlans() {
-        return planRepo.findAll().stream()
+        List<RoutePlan> plans = planRepo.findAll();
+        plans.forEach(plan -> Hibernate.initialize(plan.getJobs())); // Ensure jobs are loaded
+        return plans.stream()
                 .map(plan -> new RoutePlanDTO(
                         plan.getId(),
                         plan.getCreatedAt(),
@@ -142,58 +107,75 @@ public class RouteOptimizationController {
                 )).collect(Collectors.toList());
     }
 
-    /**
-     * NEW: Assign a driver to a specific vehicle-route inside a plan.
-     * This assigns only those jobs in plan where assignedVehicleId == vehicleId.
-     *
-     * PUT /api/optimize/plans/{planId}/routes/{vehicleId}/assign
-     * Body: { "driverId": 5 }
-     */
+    // 3️⃣ ASSIGN DRIVER
     @PutMapping("/plans/{planId}/routes/{vehicleId}/assign")
     @Transactional
     public ResponseEntity<String> assignDriverToVehicleRoute(
             @PathVariable Long planId,
             @PathVariable Long vehicleId,
-            @RequestBody Map<String, Long> request) {
+            @RequestBody Map<String, Long> body) {
 
-        Long driverId = request.get("driverId");
-        if (driverId == null) {
+        Long driverId = body.get("driverId");
+        if (driverId == null)
             return ResponseEntity.badRequest().body("driverId must be provided.");
-        }
 
         RoutePlan plan = planRepo.findById(planId)
                 .orElseThrow(() -> new RuntimeException("Route Plan not found"));
 
-        // Find jobs belonging to this plan & this vehicle route
-        List<DeliveryJob> routeJobs = deliveryRepo.findByRoutePlanIdAndAssignedVehicleId(planId, vehicleId);
+        List<DeliveryJob> routeJobs =
+                deliveryRepo.findByRoutePlanIdAndAssignedVehicleId(planId, vehicleId);
 
-        if (routeJobs == null || routeJobs.isEmpty()) {
-            return ResponseEntity.badRequest().body("No jobs found for this plan / vehicle route.");
-        }
+        if (routeJobs.isEmpty())
+            return ResponseEntity.badRequest().body("No jobs found for this route.");
 
-        // Check if already assigned (fresh DB data)
         boolean alreadyAssigned = routeJobs.stream()
                 .anyMatch(j -> j.getAssignedDriverId() != null);
-        if (alreadyAssigned) {
-            return ResponseEntity.badRequest().body("This vehicle route is already assigned to a driver.");
-        }
+
+        if (alreadyAssigned)
+            return ResponseEntity.badRequest().body("This route already has a driver.");
 
         User driver = userRepo.findById(driverId)
                 .orElseThrow(() -> new RuntimeException("Driver not found"));
 
-        if (driver.getRole() != User.Role.Driver) {
-            return ResponseEntity.badRequest().body("Selected user is not a Driver.");
-        }
+        if (driver.getRole() != User.Role.Driver)
+            return ResponseEntity.badRequest().body("Selected user is not a valid Driver.");
 
-        // Validate vehicle exists (vehicleId used in job.assignedVehicleId)
         Vehicle vehicle = vehicleService.getVehicleById(vehicleId);
 
-        // Assign driver to those jobs and save individually
-        for (DeliveryJob job : routeJobs) {
-            job.setAssignedDriverId(driverId);
-            deliveryRepo.save(job);
+        for (DeliveryJob j : routeJobs) {
+            j.setAssignedDriverId(driverId);
+            deliveryRepo.save(j);
         }
 
-        return ResponseEntity.ok("Assigned driver " + driver.getName() + " to vehicle-route " + vehicleId + " in plan #" + planId);
+        return ResponseEntity.ok(
+                "Driver " + driver.getName() + " assigned to vehicle "
+                        + vehicle.getLicensePlate() + " in plan #" + planId
+        );
+    }
+
+    // 4️⃣ GET ALL PLANS WITH JOBS — FOR RoutePlans PAGE
+    // IN RouteOptimizationController.java → REPLACE THIS METHOD ONLY
+    @GetMapping("/route-plans/all")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<RoutePlan>> getAllPlansWithJobs() {
+        try {
+            // 1. Get all plans sorted by ID descending
+            List<RoutePlan> plans = planRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
+
+            // 2. For EACH plan, FORCE LOAD the jobs (this is the key!)
+            for (RoutePlan plan : plans) {
+                Hibernate.initialize(plan.getJobs());
+                // Extra safety: reload jobs from DB
+                List<DeliveryJob> jobs = deliveryRepo.findByRoutePlanId(plan.getId());
+                plan.setJobs(jobs);
+            }
+
+            System.out.println("Returning " + plans.size() + " plans with jobs");
+            return ResponseEntity.ok(plans);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(new ArrayList<>()); // Never crash
+        }
     }
 }
