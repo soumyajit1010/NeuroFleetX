@@ -155,27 +155,24 @@ public class RouteOptimizationController {
 
     // 4️⃣ GET ALL PLANS WITH JOBS — FOR RoutePlans PAGE
     // IN RouteOptimizationController.java → REPLACE THIS METHOD ONLY
+    // IN RouteOptimizationController.java → REPLACE THE ENTIRE METHOD WITH THIS
+
     @GetMapping("/route-plans/all")
     @Transactional(readOnly = true)
     public ResponseEntity<List<RoutePlan>> getAllPlansWithJobs() {
         try {
-            // 1. Get all plans sorted by ID descending
             List<RoutePlan> plans = planRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
 
-            // 2. For EACH plan, FORCE LOAD the jobs (this is the key!)
             for (RoutePlan plan : plans) {
-                Hibernate.initialize(plan.getJobs());
-                // Extra safety: reload jobs from DB
+                // SAFE WAY — NO HIBERNATE INITIALIZE (it crashes when columns missing)
                 List<DeliveryJob> jobs = deliveryRepo.findByRoutePlanId(plan.getId());
                 plan.setJobs(jobs);
             }
 
-            System.out.println("Returning " + plans.size() + " plans with jobs");
             return ResponseEntity.ok(plans);
-
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.ok(new ArrayList<>()); // Never crash
+            return ResponseEntity.ok(new ArrayList<>());
         }
     }
 }
