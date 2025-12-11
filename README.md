@@ -11,7 +11,7 @@ This repository contains all my **Java** and **React** practice exercises, along
 **Start Date:** 13th October 2025  
 **End Date:** 3rd December 2025  
 **Timing:** 7:30 PM – 8:30 PM  
-**Mentor:** Senthil Subramanian  
+**Mentor:** Mr. Senthil Subramanian  
 
 ---
 
@@ -33,7 +33,7 @@ This repository contains all my **Java** and **React** practice exercises, along
 | 🧮 **Array Programs** | Single and multidimensional array-based problems. |
 | 🧱 **Class & Object Programs** | Demonstrating classes, objects, and constructors. |
 | ⚛️ **React Exercises** | Hands-on practice with a **Login Page UI** using React. |
-| 🧩 **Main Project (Module 1)** | Developed **Authentication & Role Management** frontend in React. |
+| 🧩 **Full Project Modules** | All 6 NeuroFleetX modules completed |
 
 ---
 
@@ -42,11 +42,11 @@ This repository contains all my **Java** and **React** practice exercises, along
 | Module | Description | Status |
 |:-------|:-------------|:-------:|
 | **Module 1** | Authentication & Role Management | ✅ Complete |
-| **Module 2** | Fleet Inventory & Vehicle Telemetry | ✅ Ongoing |
-| **Module 3** | AI Route & Load Optimization Engine | 🔜 Upcoming |
-| **Module 4** | Predictive Maintenance & Health Analytics | 🔜 Upcoming |
-| **Module 5** | Customer Booking & Smart Recommendations | 🔜 Upcoming |
-| **Module 6** | Admin Dashboard & Urban Mobility Insights | 🔜 Upcoming |
+| **Module 2** | Fleet Inventory & Vehicle Telemetry | ✅ Complete |
+| **Module 3** | AI Route & Load Optimization Engine | ✅ Complete |
+| **Module 4** | Predictive Maintenance & Health Analytics | ✅ Complete |
+| **Module 5** | Customer Booking & Smart Recommendations | ✅ Complete |
+| **Module 6** | Admin Dashboard & Urban Mobility Insights | ✅ Complete |
 
 ---
 
