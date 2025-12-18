@@ -13,12 +13,6 @@ This repository contains all my **Java** and **React** practice exercises, along
 **Timing:** 7:30 PM – 8:30 PM  
 **Mentor:** Mr. Senthil Subramanian  
 
----
-
-## 📁 Repository Structure
-
----
-
 
 ---
 
